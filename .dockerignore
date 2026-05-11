@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.venv
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+db.sqlite3
+media/
+staticfiles/
+docs/

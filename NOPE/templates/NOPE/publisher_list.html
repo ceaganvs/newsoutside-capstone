@@ -1,0 +1,53 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h1>Publishers</h1>
+        {% if user.is_authenticated and user.role == 'editor' %}
+        <a href="{% url 'create_publisher' %}" class="btn btn-primary">+ New Publisher</a>
+        {% endif %}
+    </div>
+
+    {% if publishers %}
+    <div class="article-grid">
+        {% for publisher in publishers %}
+        <div class="article-card">
+            <h3>{{ publisher.name }}</h3>
+            {% if publisher.description %}
+            <p style="color: #666; margin: 0.5rem 0;">{{ publisher.description|truncatewords:20 }}</p>
+            {% endif %}
+            {% if publisher.website %}
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+                <a href="{{ publisher.website }}" target="_blank" rel="noopener">{{ publisher.website }}</a>
+            </p>
+            {% endif %}
+            <p class="article-meta" style="margin-top: 0.75rem;">
+                {{ publisher.staff_members.count }} staff member{{ publisher.staff_members.count|pluralize }}
+                &middot;
+                {{ publisher.published_articles.count }} article{{ publisher.published_articles.count|pluralize }}
+            </p>
+            {% if user.is_authenticated and user.role == 'reader' %}
+            <form method="post" action="{% url 'manage_subscriptions' %}" style="margin-top: 0.75rem;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_publisher">
+                <input type="hidden" name="publisher_id" value="{{ publisher.id }}">
+                {% if publisher.id in subscribed_publisher_ids %}
+                <button type="submit" class="btn btn-danger" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">Unsubscribe</button>
+                {% else %}
+                <button type="submit" class="btn btn-success" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">Subscribe</button>
+                {% endif %}
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No publishers yet.
+        {% if user.is_authenticated and user.role == 'editor' %}
+        <a href="{% url 'create_publisher' %}">Create the first one.</a>
+        {% endif %}
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

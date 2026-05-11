@@ -1,0 +1,50 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<h1>My Dashboard</h1>
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #e74c3c; margin-bottom: 0.5rem;">{{ total_liked }}</h3>
+        <p>Articles Liked</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #3498db; margin-bottom: 0.5rem;">{{ total_read }}</h3>
+        <p>Articles Read</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Liked Articles</h2>
+    <div class="article-grid">
+        {% for article in liked_articles|slice:":6" %}
+        <div class="article-card">
+            <h3><a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: inherit;">{{ article.title }}</a></h3>
+            <div class="article-meta">
+                By {{ article.author.get_full_name|default:article.author.username }}
+            </div>
+            <div class="article-meta">{{ article.created_at|date:"M d, Y" }}</div>
+            {% if article.summary %}
+            <p>{{ article.summary|truncatewords:20 }}</p>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p>You haven't liked any articles yet. <a href="{% url 'landing' %}">Browse articles</a></p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>Recently Read</h2>
+    {% for article in read_articles|slice:":10" %}
+    <div style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+        <a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: #2c3e50;">{{ article.title }}</a>
+        <span style="color: #7f8c8d; font-size: 0.9rem; margin-left: 1rem;">
+            By {{ article.author.get_full_name|default:article.author.username }}
+        </span>
+    </div>
+    {% empty %}
+    <p>You haven't read any articles yet. <a href="{% url 'landing' %}">Start reading</a></p>
+    {% endfor %}
+</div>
+{% endblock %}

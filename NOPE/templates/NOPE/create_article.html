@@ -1,0 +1,55 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Write New Article</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 1rem;">
+            <label for="title" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Title:</label>
+            <input type="text" id="title" name="title" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="summary" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Summary:</label>
+            <textarea id="summary" name="summary" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="content" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Content:</label>
+            <textarea id="content" name="content" rows="15" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="tags" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Tags (comma-separated):</label>
+            <input type="text" id="tags" name="tags" placeholder="politics, technology, sports" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="publisher" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Publisher (optional):</label>
+            <select id="publisher" name="publisher" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="">-- Independent Article --</option>
+                {% for pub in publishers %}
+                <option value="{{ pub.id }}">{{ pub.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px; border-left: 4px solid #3498db;">
+            <label style="display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" id="is_public" name="is_public" checked style="margin-right: 0.5rem; width: 18px; height: 18px; cursor: pointer;">
+                <span style="font-weight: bold;">Make this article public</span>
+            </label>
+            <p style="margin: 0.5rem 0 0 1.5rem; color: #666; font-size: 0.9rem;">
+                ✓ Public: Anyone can view (no login required)<br>
+                ✗ Private: Only logged-in users can view
+            </p>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">Submit for Review</button>
+            <a href="{% url 'my_articles' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

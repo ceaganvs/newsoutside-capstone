@@ -1,0 +1,49 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<h1>Editor Dashboard</h1>
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #27ae60; margin-bottom: 0.5rem;">{{ total_reviewed }}</h3>
+        <p>Articles Reviewed</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #f39c12; margin-bottom: 0.5rem;">{{ total_pending }}</h3>
+        <p>Pending Review</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Pending Articles ({{ total_pending }})</h2>
+    <a href="{% url 'pending_articles' %}" class="btn btn-primary" style="margin-bottom: 1rem;">View All Pending</a>
+    
+    {% for article in pending_articles|slice:":5" %}
+    <div style="padding: 1rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px;">
+        <h3><a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: #2c3e50;">{{ article.title }}</a></h3>
+        <div class="article-meta">
+            By {{ article.author.get_full_name|default:article.author.username }}
+            | {{ article.created_at|date:"M d, Y" }}
+        </div>
+        <div style="margin-top: 0.5rem;">
+            <a href="{% url 'approve_article' article.id %}" class="btn btn-success">Approve</a>
+            <a href="{% url 'reject_article' article.id %}" class="btn btn-danger">Reject</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>No pending articles. Great job!</p>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h2>Recently Reviewed</h2>
+    {% for article in reviewed_articles|slice:":10" %}
+    <div style="padding: 0.75rem; border-bottom: 1px solid #eee;">
+        <a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: #2c3e50;">{{ article.title }}</a>
+        <span style="color: #7f8c8d; font-size: 0.9rem; margin-left: 1rem;">{{ article.approved_at|date:"M d, Y" }}</span>
+    </div>
+    {% empty %}
+    <p>No articles reviewed yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

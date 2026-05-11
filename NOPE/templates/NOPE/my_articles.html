@@ -1,0 +1,48 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<h1>My Articles</h1>
+
+<div style="margin-bottom: 1rem;">
+    <a href="{% url 'create_article' %}" class="btn btn-primary">Write New Article</a>
+</div>
+
+<div class="article-grid">
+    {% for article in page_obj %}
+    <div class="article-card">
+        <h3><a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: inherit;">{{ article.title }}</a></h3>
+        <div class="article-meta">
+            {{ article.created_at|date:"M d, Y" }}
+            {% if article.approved %}
+                <span class="badge" style="background: #27ae60;">Approved</span>
+            {% else %}
+                <span class="badge" style="background: #f39c12;">Pending</span>
+            {% endif %}
+        </div>
+        {% if article.summary %}
+        <p>{{ article.summary|truncatewords:20 }}</p>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div class="card">
+        <p>You haven't written any articles yet. <a href="{% url 'create_article' %}">Write your first article</a>!</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

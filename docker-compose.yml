@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: news_outside
+      MARIADB_USER: newsuser
+      MARIADB_PASSWORD: newspassword
+      MARIADB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: django-insecure-docker-dev-key-change-in-production
+      DEBUG: "True"
+      DB_NAME: news_outside
+      DB_USER: newsuser
+      DB_PASSWORD: newspassword
+      DB_HOST: db
+      DB_PORT: "3306"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - media_data:/app/media
+
+volumes:
+  db_data:
+  media_data:

@@ -1,0 +1,33 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>{{ newsletter.title }}</h1>
+    <div class="article-meta" style="margin-bottom: 1rem;">
+        Curated by {{ newsletter.author.get_full_name|default:newsletter.author.username }}
+        | {{ newsletter.created_at|date:"F d, Y" }}
+    </div>
+    
+    <p style="font-size: 1.1rem; margin-bottom: 2rem;">{{ newsletter.description }}</p>
+    
+    <h2 style="margin-bottom: 1rem;">Featured Articles ({{ newsletter.articles.count }})</h2>
+    
+    {% for article in newsletter.articles.all %}
+    <div class="card">
+        <h3><a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: inherit;">{{ article.title }}</a></h3>
+        <div class="article-meta">
+            By {{ article.author.get_full_name|default:article.author.username }}
+            | {{ article.created_at|date:"M d, Y" }}
+        </div>
+        {% if article.summary %}
+        <p>{{ article.summary }}</p>
+        {% endif %}
+        <a href="{% url 'article_detail' article.id %}" class="btn btn-primary">Read Article</a>
+    </div>
+    {% empty %}
+    <p>No articles in this newsletter yet.</p>
+    {% endfor %}
+</div>
+
+<a href="{% url 'newsletter_list' %}" class="btn btn-secondary">Back to Newsletters</a>
+{% endblock %}

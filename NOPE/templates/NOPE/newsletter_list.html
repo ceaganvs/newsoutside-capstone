@@ -1,0 +1,38 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<h1>Newsletters</h1>
+
+{% for newsletter in page_obj %}
+<div class="card">
+    <h2><a href="{% url 'newsletter_detail' newsletter.id %}" style="text-decoration: none; color: inherit;">{{ newsletter.title }}</a></h2>
+    <div class="article-meta">
+        By {{ newsletter.author.get_full_name|default:newsletter.author.username }}
+        | {{ newsletter.created_at|date:"M d, Y" }}
+        | {{ newsletter.articles.count }} article{{ newsletter.articles.count|pluralize }}
+    </div>
+    <p>{{ newsletter.description|truncatewords:50 }}</p>
+    <a href="{% url 'newsletter_detail' newsletter.id %}" class="btn btn-primary">Read Newsletter</a>
+</div>
+{% empty %}
+<div class="card">
+    <p>No newsletters available yet.</p>
+</div>
+{% endfor %}
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

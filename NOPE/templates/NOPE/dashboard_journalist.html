@@ -1,0 +1,66 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<h1>Journalist Dashboard</h1>
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #3498db; margin-bottom: 0.5rem;">{{ total_articles }}</h3>
+        <p>Total Articles</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #27ae60; margin-bottom: 0.5rem;">{{ approved_articles }}</h3>
+        <p>Approved</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #f39c12; margin-bottom: 0.5rem;">{{ total_views }}</h3>
+        <p>Total Views</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3 style="font-size: 2rem; color: #e74c3c; margin-bottom: 0.5rem;">{{ total_likes }}</h3>
+        <p>Total Likes</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>My Articles</h2>
+    <a href="{% url 'create_article' %}" class="btn btn-primary" style="margin-bottom: 1rem;">Write New Article</a>
+    
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid #ddd;">
+                <th style="text-align: left; padding: 0.75rem;">Title</th>
+                <th style="text-align: center; padding: 0.75rem;">Status</th>
+                <th style="text-align: center; padding: 0.75rem;">Views</th>
+                <th style="text-align: center; padding: 0.75rem;">Likes</th>
+                <th style="text-align: center; padding: 0.75rem;">Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 0.75rem;">
+                    <a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: #2c3e50;">{{ article.title }}</a>
+                </td>
+                <td style="text-align: center; padding: 0.75rem;">
+                    {% if article.approved %}
+                    <span class="badge" style="background: #27ae60; color: white;">Approved</span>
+                    {% else %}
+                    <span class="badge" style="background: #f39c12; color: white;">Pending</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: center; padding: 0.75rem;">{{ article.view_count }}</td>
+                <td style="text-align: center; padding: 0.75rem;">{{ article.liked_by.count }}</td>
+                <td style="text-align: center; padding: 0.75rem;">{{ article.created_at|date:"M d, Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 2rem; text-align: center; color: #7f8c8d;">
+                    No articles yet. <a href="{% url 'create_article' %}">Write your first article</a>!
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

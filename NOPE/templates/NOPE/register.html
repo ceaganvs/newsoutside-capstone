@@ -1,0 +1,56 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <h1>Create Account</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="username" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username *</label>
+            <input type="text" id="username" name="username" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email *</label>
+            <input type="email" id="email" name="email" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="first_name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">First Name</label>
+            <input type="text" id="first_name" name="first_name" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="last_name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Last Name</label>
+            <input type="text" id="last_name" name="last_name" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="role" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">I am a *</label>
+            <select id="role" name="role" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="reader">Reader - Browse and read articles</option>
+                <option value="journalist">Journalist - Write and publish articles</option>
+                <option value="editor">Editor - Review and approve articles</option>
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password *</label>
+            <input type="password" id="password" name="password" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label for="password2" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Confirm Password *</label>
+            <input type="password" id="password2" name="password2" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+    </form>
+    
+    <div style="margin-top: 1.5rem; text-align: center; padding-top: 1rem; border-top: 1px solid #ddd;">
+        <p>Already have an account? <a href="{% url 'user_login' %}">Login here</a></p>
+    </div>
+</div>
+{% endblock %}

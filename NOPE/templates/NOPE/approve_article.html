@@ -1,0 +1,19 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Approve Article</h1>
+    <h2>{{ article.title }}</h2>
+    <p><strong>Author:</strong> {{ article.author.get_full_name|default:article.author.username }}</p>
+    <p><strong>Submitted:</strong> {{ article.created_at|date:"F d, Y" }}</p>
+    
+    <form method="post" style="margin-top: 2rem;">
+        {% csrf_token %}
+        <p>Are you sure you want to approve this article? Subscribers will be notified via email and it will be posted to X (Twitter).</p>
+        <div style="margin-top: 1rem;">
+            <button type="submit" class="btn btn-success">Yes, Approve Article</button>
+            <a href="{% url 'pending_articles' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

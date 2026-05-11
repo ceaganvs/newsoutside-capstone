@@ -1,0 +1,45 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>{{ article.title }}</h1>
+    <div class="article-meta" style="margin-bottom: 1rem;">
+        By {{ article.author.get_full_name|default:article.author.username }}
+        {% if article.publisher %} | {{ article.publisher.name }}{% endif %}
+        | {{ article.created_at|date:"F d, Y" }}
+        {% if not article.approved %}
+        <span class="badge" style="background: #f39c12;">Pending Approval</span>
+        {% endif %}
+    </div>
+    
+    {% if article.summary %}
+    <p style="font-size: 1.1rem; font-style: italic; color: #555; margin-bottom: 1rem;">{{ article.summary }}</p>
+    {% endif %}
+    
+    <div style="line-height: 1.8;">
+        {{ article.content|linebreaks }}
+    </div>
+    
+    <div style="margin-top: 1.5rem;">
+        <a href="{% url 'like_article' article.id %}" class="btn {% if user_liked %}btn-danger{% else %}btn-primary{% endif %}">
+            {% if user_liked %}♥ Unlike{% else %}♡ Like{% endif %} ({{ article.liked_by.count }})
+        </a>
+        <span style="margin-left: 1rem; color: #7f8c8d;">{{ article.view_count }} views</span>
+    </div>
+    
+    {% if article.tags %}
+    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+        <strong>Tags:</strong> {{ article.tags }}
+    </div>
+    {% endif %}
+    
+    {% if user.role == 'editor' and not article.approved %}
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #ddd;">
+        <a href="{% url 'approve_article' article.id %}" class="btn btn-success">Approve Article</a>
+        <a href="{% url 'reject_article' article.id %}" class="btn btn-danger">Reject Article</a>
+    </div>
+    {% endif %}
+</div>
+
+<a href="{% url 'home' %}" class="btn btn-secondary">Back to Articles</a>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Articles Pending Review</h1>
+    <p>Review and approve articles submitted by journalists.</p>
+</div>
+
+{% for article in page_obj %}
+<div class="card">
+    <h2><a href="{% url 'article_detail' article.id %}" style="text-decoration: none; color: inherit;">{{ article.title }}</a></h2>
+    <div class="article-meta">
+        By {{ article.author.get_full_name|default:article.author.username }}
+        {% if article.publisher %} | {{ article.publisher.name }}{% endif %}
+        | Submitted on {{ article.created_at|date:"M d, Y" }}
+    </div>
+    {% if article.summary %}
+    <p>{{ article.summary }}</p>
+    {% endif %}
+    <div style="margin-top: 1rem;">
+        <a href="{% url 'approve_article' article.id %}" class="btn btn-success">Approve</a>
+        <a href="{% url 'reject_article' article.id %}" class="btn btn-danger">Reject</a>
+        <a href="{% url 'article_detail' article.id %}" class="btn btn-secondary">View Full Article</a>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <p>No articles pending review. Great job!</p>
+</div>
+{% endfor %}
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

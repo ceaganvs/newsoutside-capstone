@@ -1,0 +1,41 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 600px;">
+    <h1>Create Publisher</h1>
+    <p style="color: #666; margin-bottom: 1.5rem;">
+        Publishers group editors and journalists under one organisation. Articles submitted to a
+        publisher require editor approval before going live.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 1rem;">
+            <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                Publisher Name *
+            </label>
+            <input type="text" id="name" name="name" required
+                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label for="description" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                Description
+            </label>
+            <textarea id="description" name="description" rows="4"
+                      style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label for="website" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                Website
+            </label>
+            <input type="url" id="website" name="website" placeholder="https://..."
+                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Publisher</button>
+        <a href="{% url 'publisher_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

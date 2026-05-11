@@ -1,0 +1,28 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <h1>Login</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="username" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username</label>
+            <input type="text" id="username" name="username" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password</label>
+            <input type="password" id="password" name="password" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+    </form>
+    
+    <div style="margin-top: 1.5rem; text-align: center; padding-top: 1rem; border-top: 1px solid #ddd;">
+        <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+        <p style="margin-top: 0.5rem;"><a href="/admin/">Admin Login</a></p>
+    </div>
+</div>
+{% endblock %}

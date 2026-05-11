@@ -1,0 +1,87 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<h1>Manage Subscriptions</h1>
+<p style="color: #666; margin-bottom: 1.5rem;">
+    You'll receive email notifications when subscribed publishers or journalists publish new articles.
+</p>
+
+<div class="card">
+    <h2>Publishers</h2>
+    {% if publishers %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% for publisher in publishers %}
+        <div style="padding: 1rem; border: 1px solid #eee; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong>{{ publisher.name }}</strong>
+                {% if publisher.description %}
+                <p style="color: #666; font-size: 0.85rem; margin: 0.25rem 0 0;">
+                    {{ publisher.description|truncatewords:10 }}
+                </p>
+                {% endif %}
+            </div>
+            <form method="post" style="margin: 0; flex-shrink: 0; margin-left: 1rem;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_publisher">
+                <input type="hidden" name="publisher_id" value="{{ publisher.id }}">
+                {% if publisher.id in subscribed_publisher_ids %}
+                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                    Unsubscribe
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                    Subscribe
+                </button>
+                {% endif %}
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="margin-top: 0.5rem;">No publishers available yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Journalists</h2>
+    {% if journalists %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {% for journalist in journalists %}
+        <div style="padding: 1rem; border: 1px solid #eee; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong>{{ journalist.get_full_name|default:journalist.username }}</strong>
+                {% if journalist.publisher %}
+                <p style="color: #7f8c8d; font-size: 0.8rem; margin: 0.2rem 0 0;">
+                    {{ journalist.publisher.name }}
+                </p>
+                {% else %}
+                <p style="color: #7f8c8d; font-size: 0.8rem; margin: 0.2rem 0 0;">Independent</p>
+                {% endif %}
+                {% if journalist.bio %}
+                <p style="color: #666; font-size: 0.85rem; margin: 0.25rem 0 0;">
+                    {{ journalist.bio|truncatewords:10 }}
+                </p>
+                {% endif %}
+            </div>
+            <form method="post" style="margin: 0; flex-shrink: 0; margin-left: 1rem;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_journalist">
+                <input type="hidden" name="journalist_id" value="{{ journalist.id }}">
+                {% if journalist.id in subscribed_journalist_ids %}
+                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                    Unsubscribe
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                    Subscribe
+                </button>
+                {% endif %}
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="margin-top: 0.5rem;">No journalists registered yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Reject Article</h1>
+    <h2>{{ article.title }}</h2>
+    <p><strong>Author:</strong> {{ article.author.get_full_name|default:article.author.username }}</p>
+    <p><strong>Submitted:</strong> {{ article.created_at|date:"F d, Y" }}</p>
+    
+    <form method="post" style="margin-top: 2rem;">
+        {% csrf_token %}
+        <p style="color: #e74c3c;"><strong>Warning:</strong> This will permanently delete the article. This action cannot be undone.</p>
+        <div style="margin-top: 1rem;">
+            <button type="submit" class="btn btn-danger">Yes, Reject and Delete</button>
+            <a href="{% url 'pending_articles' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
