@@ -25,7 +25,12 @@ urlpatterns = [
 
     # Newsletters
     path('newsletters/', views.newsletter_list, name='newsletter_list'),
+    path('newsletters/create/', views.create_newsletter, name='create_newsletter'),
     path('newsletters/<int:newsletter_id>/', views.newsletter_detail, name='newsletter_detail'),
+    path('newsletters/<int:newsletter_id>/edit/', views.edit_newsletter, name='edit_newsletter'),
+
+    # Editor article editing
+    path('articles/<int:article_id>/edit/', views.edit_article, name='edit_article'),
 
     # Publishers
     path('publishers/', views.publisher_list, name='publisher_list'),

@@ -29,5 +29,8 @@
     {% endfor %}
 </div>
 
+{% if user.role == 'editor' %}
+<a href="{% url 'edit_newsletter' newsletter.id %}" class="btn btn-primary">Edit Newsletter</a>
+{% endif %}
 <a href="{% url 'newsletter_list' %}" class="btn btn-secondary">Back to Newsletters</a>
 {% endblock %}

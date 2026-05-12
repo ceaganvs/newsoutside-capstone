@@ -1,10 +1,9 @@
-"""
-NOPE views module.
+"""Views for the News Outside application.
 
-Handles all HTTP request/response logic for the News Outside Publishing Engine,
-including authentication, article management, publisher administration,
-reader subscriptions, and newsletter browsing.
+Handles web-facing pages for authentication, article management,
+publisher administration, newsletter browsing, and reader subscriptions.
 """
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login, logout, authenticate
@@ -16,7 +15,7 @@ from .models import Article, Newsletter, Publisher, CustomUser
 
 
 def register(request):
-    """Register a new user account with a chosen role (reader, journalist, or editor)."""
+    """Display and process the user registration form."""
     if request.user.is_authenticated:
         return redirect('landing')
 
@@ -254,11 +253,7 @@ def like_article(request, article_id):
 @login_required
 @user_passes_test(is_journalist)
 def create_article(request):
-    """Allow a journalist to write and submit a new article.
-
-    Independent articles (no publisher) publish immediately.
-    Publisher-affiliated articles enter an editor approval queue.
-    """
+    """Display the article creation form and handle submission."""
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
@@ -271,10 +266,6 @@ def create_article(request):
         if publisher_id:
             publisher = get_object_or_404(Publisher, id=publisher_id)
 
-        # Independent articles (no publisher) publish immediately without editor approval.
-        # Articles submitted to a publisher go through the normal editor review workflow.
-        is_independent = publisher is None
-
         article = Article.objects.create(
             title=title,
             content=content,
@@ -283,16 +274,13 @@ def create_article(request):
             author=request.user,
             publisher=publisher,
             is_public=is_public,
-            approved=is_independent,
-            approved_at=timezone.now() if is_independent else None,
+            approved=False,
         )
 
-        if is_independent:
-            from .signals import _notify_subscribers_via_email
-            _notify_subscribers_via_email(article)
-            messages.success(request, f'Article "{article.title}" published successfully.')
-        else:
+        if publisher:
             messages.success(request, f'Article "{article.title}" submitted to {publisher.name} for editor review.')
+        else:
+            messages.success(request, f'Article "{article.title}" submitted for editor review.')
 
         return redirect('my_articles')
 
@@ -312,6 +300,90 @@ def my_articles(request):
     page_obj = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'NOPE/my_articles.html', {'page_obj': page_obj, 'title': 'My Articles'})
+
+
+@login_required
+@user_passes_test(is_editor_or_journalist)
+def create_newsletter(request):
+    """Allow journalists and editors to create a new newsletter."""
+    approved_articles = Article.objects.filter(approved=True).order_by('-created_at')
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        article_ids = request.POST.getlist('articles')
+        published = request.POST.get('published') == 'on'
+
+        if not title:
+            messages.error(request, 'Title is required.')
+        else:
+            newsletter = Newsletter.objects.create(
+                title=title,
+                description=description,
+                author=request.user,
+                published=published,
+            )
+            if article_ids:
+                newsletter.articles.set(Article.objects.filter(id__in=article_ids))
+            messages.success(request, f'Newsletter "{newsletter.title}" created successfully.')
+            return redirect('newsletter_list')
+
+    return render(request, 'NOPE/create_newsletter.html', {
+        'approved_articles': approved_articles,
+        'title': 'Create Newsletter',
+    })
+
+
+@login_required
+@user_passes_test(is_editor)
+def edit_article(request, article_id):
+    """Allow editors to update any article."""
+    article = get_object_or_404(Article, id=article_id)
+    publishers = Publisher.objects.all()
+
+    if request.method == 'POST':
+        article.title = request.POST.get('title', article.title).strip()
+        article.summary = request.POST.get('summary', article.summary).strip()
+        article.content = request.POST.get('content', article.content).strip()
+        article.tags = request.POST.get('tags', article.tags).strip()
+        article.is_public = request.POST.get('is_public') == 'on'
+        publisher_id = request.POST.get('publisher')
+        article.publisher = get_object_or_404(Publisher, id=publisher_id) if publisher_id else None
+        article.save()
+        messages.success(request, f'Article "{article.title}" updated successfully.')
+        return redirect('article_detail', article_id=article.id)
+
+    return render(request, 'NOPE/edit_article.html', {
+        'article': article,
+        'publishers': publishers,
+        'title': f'Edit: {article.title}',
+    })
+
+
+@login_required
+@user_passes_test(is_editor)
+def edit_newsletter(request, newsletter_id):
+    """Allow editors to update any newsletter."""
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+    approved_articles = Article.objects.filter(approved=True).order_by('-created_at')
+    selected_ids = set(newsletter.articles.values_list('id', flat=True))
+
+    if request.method == 'POST':
+        newsletter.title = request.POST.get('title', newsletter.title).strip()
+        newsletter.description = request.POST.get('description', newsletter.description).strip()
+        newsletter.published = request.POST.get('published') == 'on'
+        article_ids = request.POST.getlist('articles')
+        newsletter.save()
+        newsletter.articles.set(Article.objects.filter(id__in=article_ids))
+        messages.success(request, f'Newsletter "{newsletter.title}" updated successfully.')
+        return redirect('newsletter_detail', newsletter_id=newsletter.id)
+
+    return render(request, 'NOPE/edit_newsletter.html', {
+        'newsletter': newsletter,
+        'approved_articles': approved_articles,
+        'selected_ids': selected_ids,
+        'title': f'Edit: {newsletter.title}',
+    })
 
 
 @login_required
