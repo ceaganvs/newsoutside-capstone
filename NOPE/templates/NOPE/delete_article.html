@@ -1,0 +1,14 @@
+{% extends 'NOPE/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Delete Article</h1>
+    <p>Are you sure you want to delete the article <strong>"{{ article.title }}"</strong>?</p>
+    <p style="color: #e74c3c;">This action cannot be undone.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'article_detail' article.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -335,10 +335,15 @@ def create_newsletter(request):
 
 
 @login_required
-@user_passes_test(is_editor)
+@user_passes_test(is_editor_or_journalist)
 def edit_article(request, article_id):
-    """Allow editors to update any article."""
+    """Allow editors to update any article, journalists to update their own."""
     article = get_object_or_404(Article, id=article_id)
+
+    if request.user.role == 'journalist' and article.author != request.user:
+        messages.error(request, 'You can only edit your own articles.')
+        return redirect('article_detail', article_id=article.id)
+
     publishers = Publisher.objects.all()
 
     if request.method == 'POST':
@@ -361,10 +366,39 @@ def edit_article(request, article_id):
 
 
 @login_required
-@user_passes_test(is_editor)
+@user_passes_test(is_editor_or_journalist)
+def delete_article(request, article_id):
+    """Allow editors to delete any article, journalists to delete their own."""
+    article = get_object_or_404(Article, id=article_id)
+
+    if request.user.role == 'journalist' and article.author != request.user:
+        messages.error(request, 'You can only delete your own articles.')
+        return redirect('article_detail', article_id=article.id)
+
+    if request.method == 'POST':
+        title = article.title
+        article.delete()
+        messages.success(request, f'Article "{title}" deleted successfully.')
+        if request.user.role == 'journalist':
+            return redirect('my_articles')
+        return redirect('dashboard')
+
+    return render(request, 'NOPE/delete_article.html', {
+        'article': article,
+        'title': f'Delete: {article.title}',
+    })
+
+
+@login_required
+@user_passes_test(is_editor_or_journalist)
 def edit_newsletter(request, newsletter_id):
-    """Allow editors to update any newsletter."""
+    """Allow editors to update any newsletter, journalists to update their own."""
     newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+
+    if request.user.role == 'journalist' and newsletter.author != request.user:
+        messages.error(request, 'You can only edit your own newsletters.')
+        return redirect('newsletter_detail', newsletter_id=newsletter.id)
+
     approved_articles = Article.objects.filter(approved=True).order_by('-created_at')
     selected_ids = set(newsletter.articles.values_list('id', flat=True))
 
@@ -383,6 +417,28 @@ def edit_newsletter(request, newsletter_id):
         'approved_articles': approved_articles,
         'selected_ids': selected_ids,
         'title': f'Edit: {newsletter.title}',
+    })
+
+
+@login_required
+@user_passes_test(is_editor_or_journalist)
+def delete_newsletter(request, newsletter_id):
+    """Allow editors to delete any newsletter, journalists to delete their own."""
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+
+    if request.user.role == 'journalist' and newsletter.author != request.user:
+        messages.error(request, 'You can only delete your own newsletters.')
+        return redirect('newsletter_detail', newsletter_id=newsletter.id)
+
+    if request.method == 'POST':
+        title = newsletter.title
+        newsletter.delete()
+        messages.success(request, f'Newsletter "{title}" deleted successfully.')
+        return redirect('newsletter_list')
+
+    return render(request, 'NOPE/delete_newsletter.html', {
+        'newsletter': newsletter,
+        'title': f'Delete: {newsletter.title}',
     })
 
 

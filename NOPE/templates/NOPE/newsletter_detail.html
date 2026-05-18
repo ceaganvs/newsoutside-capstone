@@ -29,8 +29,9 @@
     {% endfor %}
 </div>
 
-{% if user.role == 'editor' %}
+{% if user.role == 'editor' or user.role == 'journalist' and newsletter.author == user %}
 <a href="{% url 'edit_newsletter' newsletter.id %}" class="btn btn-primary">Edit Newsletter</a>
+<a href="{% url 'delete_newsletter' newsletter.id %}" class="btn btn-danger">Delete Newsletter</a>
 {% endif %}
 <a href="{% url 'newsletter_list' %}" class="btn btn-secondary">Back to Newsletters</a>
 {% endblock %}

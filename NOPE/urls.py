@@ -28,9 +28,11 @@ urlpatterns = [
     path('newsletters/create/', views.create_newsletter, name='create_newsletter'),
     path('newsletters/<int:newsletter_id>/', views.newsletter_detail, name='newsletter_detail'),
     path('newsletters/<int:newsletter_id>/edit/', views.edit_newsletter, name='edit_newsletter'),
+    path('newsletters/<int:newsletter_id>/delete/', views.delete_newsletter, name='delete_newsletter'),
 
-    # Editor article editing
+    # Article editing and deleting
     path('articles/<int:article_id>/edit/', views.edit_article, name='edit_article'),
+    path('articles/<int:article_id>/delete/', views.delete_article, name='delete_article'),
 
     # Publishers
     path('publishers/', views.publisher_list, name='publisher_list'),

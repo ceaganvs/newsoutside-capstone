@@ -13,6 +13,10 @@
     </div>
     <p>{{ newsletter.description|truncatewords:50 }}</p>
     <a href="{% url 'newsletter_detail' newsletter.id %}" class="btn btn-primary">Read Newsletter</a>
+    {% if user.role == 'editor' or user.role == 'journalist' and newsletter.author == user %}
+    <a href="{% url 'edit_newsletter' newsletter.id %}" class="btn btn-secondary">Edit</a>
+    <a href="{% url 'delete_newsletter' newsletter.id %}" class="btn btn-danger">Delete</a>
+    {% endif %}
 </div>
 {% empty %}
 <div class="card">

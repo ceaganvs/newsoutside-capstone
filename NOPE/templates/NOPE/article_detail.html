@@ -33,10 +33,11 @@
     </div>
     {% endif %}
     
-    {% if user.role == 'editor' %}
+    {% if user.role == 'editor' or user.role == 'journalist' and article.author == user %}
     <div style="margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #ddd;">
         <a href="{% url 'edit_article' article.id %}" class="btn btn-primary">Edit Article</a>
-        {% if not article.approved %}
+        <a href="{% url 'delete_article' article.id %}" class="btn btn-danger">Delete Article</a>
+        {% if user.role == 'editor' and not article.approved %}
         <a href="{% url 'approve_article' article.id %}" class="btn btn-success">Approve Article</a>
         <a href="{% url 'reject_article' article.id %}" class="btn btn-danger">Reject Article</a>
         {% endif %}
